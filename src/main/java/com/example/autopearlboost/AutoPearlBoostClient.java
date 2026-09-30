@@ -4,6 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -25,7 +26,9 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Config.load();
-        ClientTickEvents.END_LEVEL_TICK.register(level -> tick(Minecraft.getInstance()));
+        ClientTickEvents.END_LEVEL_TICK.register(
+                level -> tick(Minecraft.getInstance())
+        );
     }
 
     private static void tick(Minecraft client) {
@@ -69,30 +72,39 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
         }
 
         int windSlot = findWindChargeHotbarSlot(player);
+
         if (windSlot < 0) {
             return;
         }
 
         Vec3 target = findInterceptPoint(player, pearl);
+
         if (target == null) {
             return;
         }
 
-        if (target.distanceTo(player.getEyePosition()) > Config.maxDistance) {
+        if (target.distanceTo(player.getEyePosition())
+                > Config.maxDistance) {
             return;
         }
 
-        int oldSlot = player.getInventory().getSelectedSlot();
+        int oldSlot =
+                player.getInventory().getSelectedSlot();
+
         float oldYaw = player.getYRot();
         float oldPitch = player.getXRot();
 
         try {
-            player.getInventory().setSelectedSlot(windSlot);
+            // Switch locally AND synchronize the selected slot
+            // with the server.
+            setSlot(client, player, windSlot);
 
-            Vec3 aim = target.subtract(player.getEyePosition());
+            Vec3 aim =
+                    target.subtract(player.getEyePosition());
 
             double horizontal = Math.sqrt(
-                    aim.x * aim.x + aim.z * aim.z
+                    aim.x * aim.x +
+                    aim.z * aim.z
             );
 
             if (horizontal < 0.001) {
@@ -106,7 +118,8 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
             float pitch = (float) (
                     Math.toDegrees(
                             Math.atan2(-aim.y, horizontal)
-                    ) + Config.downwardAimDegrees
+                    )
+                    + Config.downwardAimDegrees
             );
 
             player.setYRot(yaw);
@@ -117,12 +130,33 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
                     InteractionHand.MAIN_HAND
             );
 
-            cooldown = Math.max(1, Config.cooldownTicks);
+            cooldown =
+                    Math.max(1, Config.cooldownTicks);
 
         } finally {
-            player.getInventory().setSelectedSlot(oldSlot);
+            // Restore the original slot and synchronize it too.
+            setSlot(client, player, oldSlot);
+
             player.setYRot(oldYaw);
             player.setXRot(oldPitch);
+        }
+    }
+
+    private static void setSlot(
+            Minecraft client,
+            LocalPlayer player,
+            int slot
+    ) {
+        if (slot < 0 || slot > 8) {
+            return;
+        }
+
+        player.getInventory().setSelectedSlot(slot);
+
+        if (client.getConnection() != null) {
+            client.getConnection().send(
+                    new ServerboundSetCarriedItemPacket(slot)
+            );
         }
     }
 
@@ -130,10 +164,14 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
             LocalPlayer player,
             ThrownEnderpearl pearl
     ) {
-        Vec3 eye = player.getEyePosition();
-        Vec3 toPearl = pearl.position().subtract(eye);
+        Vec3 eye =
+                player.getEyePosition();
 
-        double distance = toPearl.length();
+        Vec3 toPearl =
+                pearl.position().subtract(eye);
+
+        double distance =
+                toPearl.length();
 
         if (distance < 0.001
                 || distance > Config.maxDistance) {
@@ -156,13 +194,16 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
             Minecraft client,
             LocalPlayer player
     ) {
-        double radius = Config.maxDistance + 8.0;
+        double radius =
+                Config.maxDistance + 8.0;
 
-        for (ThrownEnderpearl pearl : client.level.getEntitiesOfClass(
-                ThrownEnderpearl.class,
-                player.getBoundingBox().inflate(radius),
-                p -> !p.isRemoved()
-        )) {
+        for (ThrownEnderpearl pearl :
+                client.level.getEntitiesOfClass(
+                        ThrownEnderpearl.class,
+                        player.getBoundingBox().inflate(radius),
+                        p -> !p.isRemoved()
+                )) {
+
             if (pearl.getOwner() == player) {
                 return pearl;
             }
@@ -197,11 +238,18 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
             LocalPlayer player,
             ThrownEnderpearl pearl
     ) {
-        Vec3 origin = player.getEyePosition();
-        Vec3 start = pearl.position();
-        Vec3 velocity = pearl.getDeltaMovement();
+        Vec3 origin =
+                player.getEyePosition();
 
-        double bestScore = Double.MAX_VALUE;
+        Vec3 start =
+                pearl.position();
+
+        Vec3 velocity =
+                pearl.getDeltaMovement();
+
+        double bestScore =
+                Double.MAX_VALUE;
+
         Vec3 best = null;
 
         for (

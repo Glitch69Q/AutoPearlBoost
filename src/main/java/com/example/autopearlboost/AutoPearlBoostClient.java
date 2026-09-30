@@ -29,7 +29,9 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
     }
 
     private static void tick(Minecraft client) {
-        if (cooldown > 0) cooldown--;
+        if (cooldown > 0) {
+            cooldown--;
+        }
 
         if (!Config.enabled
                 || client.level == null
@@ -62,16 +64,19 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
             return;
         }
 
-        // Only activate when the player is actually looking at the pearl.
         if (!isLookingAtPearl(player, pearl)) {
             return;
         }
 
         int windSlot = findWindChargeHotbarSlot(player);
-        if (windSlot < 0) return;
+        if (windSlot < 0) {
+            return;
+        }
 
         Vec3 target = findInterceptPoint(player, pearl);
-        if (target == null) return;
+        if (target == null) {
+            return;
+        }
 
         if (target.distanceTo(player.getEyePosition()) > Config.maxDistance) {
             return;
@@ -90,15 +95,19 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
                     aim.x * aim.x + aim.z * aim.z
             );
 
-            if (horizontal < 0.001) return;
+            if (horizontal < 0.001) {
+                return;
+            }
 
             float yaw = (float) Math.toDegrees(
                     Math.atan2(-aim.x, aim.z)
             );
 
-            float pitch = (float) Math.toDegrees(
-                    Math.atan2(-aim.y, horizontal)
-            ) + Config.downwardAimDegrees;
+            float pitch = (float) (
+                    Math.toDegrees(
+                            Math.atan2(-aim.y, horizontal)
+                    ) + Config.downwardAimDegrees
+            );
 
             player.setYRot(yaw);
             player.setXRot(pitch);

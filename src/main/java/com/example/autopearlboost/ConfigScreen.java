@@ -16,53 +16,71 @@ public final class ConfigScreen extends Screen {
 
     @Override
     protected void init() {
-        int cx = this.width / 2;
-        int y = this.height / 4;
+        int centerX = this.width / 2;
+        int y = 60;
 
-        addRenderableWidget(Button.builder(toggle("Auto Pearl Boost", Config.enabled), b -> {
-            Config.enabled = !Config.enabled;
-            b.setMessage(toggle("Auto Pearl Boost", Config.enabled));
-            Config.save();
-        }).bounds(cx - 100, y, 200, 20).build());
+        this.addRenderableWidget(
+                Button.builder(
+                        Component.literal(
+                                "Enabled: " + (Config.enabled ? "ON" : "OFF")
+                        ),
+                        button -> {
+                            Config.enabled = !Config.enabled;
+                            button.setMessage(
+                                    Component.literal(
+                                            "Enabled: " + (Config.enabled ? "ON" : "OFF")
+                                    )
+                            );
+                            Config.save();
+                        }
+                ).bounds(centerX - 100, y, 200, 20).build()
+        );
 
-        addRenderableWidget(Button.builder(toggle("Automatic Wind Charge", Config.autoUse), b -> {
-            Config.autoUse = !Config.autoUse;
-            b.setMessage(toggle("Automatic Wind Charge", Config.autoUse));
-            Config.save();
-        }).bounds(cx - 100, y + 28, 200, 20).build());
+        y += 30;
 
-        addRenderableWidget(Button.builder(Component.literal("Prediction strength: " + fmt(Config.predictionStrength)), b -> {
-            Config.predictionStrength += 0.25;
-            if (Config.predictionStrength > 2.0) Config.predictionStrength = 0.25;
-            b.setMessage(Component.literal("Prediction strength: " + fmt(Config.predictionStrength)));
-            Config.save();
-        }).bounds(cx - 100, y + 56, 200, 20).build());
+        this.addRenderableWidget(
+                Button.builder(
+                        Component.literal(
+                                "Auto Use: " + (Config.autoUse ? "ON" : "OFF")
+                        ),
+                        button -> {
+                            Config.autoUse = !Config.autoUse;
+                            button.setMessage(
+                                    Component.literal(
+                                            "Auto Use: " + (Config.autoUse ? "ON" : "OFF")
+                                    )
+                            );
+                            Config.save();
+                        }
+                ).bounds(centerX - 100, y, 200, 20).build()
+        );
 
-        addRenderableWidget(Button.builder(Component.literal("Max distance: " + fmt(Config.maxDistance)), b -> {
-            Config.maxDistance += 4.0;
-            if (Config.maxDistance > 64.0) Config.maxDistance = 8.0;
-            b.setMessage(Component.literal("Max distance: " + fmt(Config.maxDistance)));
-            Config.save();
-        }).bounds(cx - 100, y + 84, 200, 20).build());
+        y += 30;
 
-        addRenderableWidget(Button.builder(Component.literal("Done"), b -> {
-            Config.save();
-            Minecraft.getInstance().setScreen(parent);
-        }).bounds(cx - 100, y + 122, 200, 20).build());
-    }
-
-    private static Component toggle(String name, boolean enabled) {
-        return Component.literal(name + ": " + (enabled ? "ON" : "OFF"));
-    }
-
-    private static String fmt(double d) {
-        return String.format(java.util.Locale.ROOT, "%.2f", d);
+        this.addRenderableWidget(
+                Button.builder(
+                        Component.literal("Close"),
+                        button -> Minecraft.getInstance().gui.setScreen(parent)
+                ).bounds(centerX - 100, y, 200, 20).build()
+        );
     }
 
     @Override
-    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        graphics.fill(0, 0, this.width, this.height, 0xCC101010);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 25, 0xFFFFFF);
-        super.render(graphics, mouseX, mouseY, delta);
+    public void extractRenderState(
+            GuiGraphicsExtractor graphics,
+            int mouseX,
+            int mouseY,
+            float delta
+    ) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+
+        graphics.text(
+                this.font,
+                this.title,
+                this.width / 2,
+                25,
+                0xFFFFFFFF,
+                true
+        );
     }
 }

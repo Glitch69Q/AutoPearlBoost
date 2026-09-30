@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "autopearlboost",
+  "version": "${version}",
+  "name": "Auto Pearl Boost",
+  "description": "Automatically aims Wind Charges to boost your own thrown Ender Pearls.",
+  "authors": [
+    "AutoPearlBoost"
+  ],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.example.autopearlboost.AutoPearlBoostClient"
+    ],
+    "modmenu": [
+      "com.example.autopearlboost.AutoPearlBoostModMenu"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.2",
+    "java": ">=25",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "modmenu": "20.0.3"
+  }
+}

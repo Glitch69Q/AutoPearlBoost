@@ -21,6 +21,7 @@ public final class Config {
     public static int preferredPredictionTick = 5;
     public static int minimumTicksAfterThrow = 1;
     public static int cooldownTicks = 6;
+    public static double downwardAimDegrees = 2.0;
 
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("autopearlboost.properties");
 
@@ -38,6 +39,7 @@ public final class Config {
         preferredPredictionTick = integer(p, "preferredPredictionTick", preferredPredictionTick);
         minimumTicksAfterThrow = integer(p, "minimumTicksAfterThrow", minimumTicksAfterThrow);
         cooldownTicks = integer(p, "cooldownTicks", cooldownTicks);
+        downwardAimDegrees = dbl(p, "downwardAimDegrees", downwardAimDegrees);
     }
 
     public static void save() {
@@ -51,6 +53,7 @@ public final class Config {
         p.setProperty("preferredPredictionTick", Integer.toString(preferredPredictionTick));
         p.setProperty("minimumTicksAfterThrow", Integer.toString(minimumTicksAfterThrow));
         p.setProperty("cooldownTicks", Integer.toString(cooldownTicks));
+        p.setProperty("downwardAimDegrees", Double.toString(downwardAimDegrees));
         try {
             Files.createDirectories(FILE.getParent());
             try (Writer w = Files.newBufferedWriter(FILE)) { p.store(w, "Auto Pearl Boost configuration"); }

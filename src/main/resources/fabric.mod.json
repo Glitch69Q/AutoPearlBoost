@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "autopearlboost",
   "version": "${version}",
-  "name": "Auto Pearl Boost",
-  "description": "Automatically aims Wind Charges to boost your own thrown Ender Pearls.",
+  "name": "No Deley",
+  "description": "Client-side utility that detects your own thrown Ender Pearl and automatically uses Wind Charges to boost it.",
   "authors": [
     "AutoPearlBoost"
   ],
@@ -24,6 +24,6 @@
     "fabric-api": "*"
   },
   "suggests": {
-    "modmenu": "20.0.3"
+    "modmenu": "20.0.2"
   }
 }

@@ -10,7 +10,7 @@ public final class ConfigScreen extends Screen {
     private final Screen parent;
 
     public ConfigScreen(Screen parent) {
-        super(Component.literal("Auto Pearl Boost"));
+        super(Component.literal("No Deley"));
         this.parent = parent;
     }
 
@@ -48,6 +48,28 @@ public final class ConfigScreen extends Screen {
                             button.setMessage(
                                     Component.literal(
                                             "Auto Use: " + (Config.autoUse ? "ON" : "OFF")
+                                    )
+                            );
+                            Config.save();
+                        }
+                ).bounds(centerX - 100, y, 200, 20).build()
+        );
+
+        y += 30;
+
+        this.addRenderableWidget(
+                Button.builder(
+                        Component.literal(
+                                "Downward Aim: " + Config.downwardAimDegrees + "°"
+                        ),
+                        button -> {
+                            Config.downwardAimDegrees += 1.0;
+                            if (Config.downwardAimDegrees > 5.0) {
+                                Config.downwardAimDegrees = 0.0;
+                            }
+                            button.setMessage(
+                                    Component.literal(
+                                            "Downward Aim: " + Config.downwardAimDegrees + "°"
                                     )
                             );
                             Config.save();

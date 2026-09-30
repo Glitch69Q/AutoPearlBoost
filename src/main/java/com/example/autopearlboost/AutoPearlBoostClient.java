@@ -25,7 +25,7 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Config.load();
-        ClientTickEvents.END_CLIENT_TICK.register(AutoPearlBoostClient::tick);
+        ClientTickEvents.END_LEVEL_TICK.register(level -> tick(Minecraft.getInstance()));
     }
 
     private static void tick(Minecraft client) {
@@ -98,7 +98,7 @@ public final class AutoPearlBoostClient implements ClientModInitializer {
 
             float pitch = (float) Math.toDegrees(
                     Math.atan2(-aim.y, horizontal)
-            );
+            ) + Config.downwardAimDegrees;
 
             player.setYRot(yaw);
             player.setXRot(pitch);
